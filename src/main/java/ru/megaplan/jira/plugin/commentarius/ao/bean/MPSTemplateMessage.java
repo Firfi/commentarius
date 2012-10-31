@@ -29,4 +29,8 @@ public interface MPSTemplateMessage extends Entity {
 
     int getPermissionBean();
     void setPermissionBean(int permissionBean);
+
+    String getCreator();
+    void setCreator(String creator);
+
 }

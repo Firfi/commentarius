@@ -17,7 +17,7 @@
     <p>Краткая форма</p>
     <input type="text" name="small"></input>
     <p>Полная форма</p>
-    <input type="text" name="full"></input>
+    <textarea name="full" style="height: 120px;"></textarea>
     <p>Сохранить</p>
     <input type="submit" class="button" name="Add" value="Add"/>
     <input type="hidden" name="add" value="true"/>

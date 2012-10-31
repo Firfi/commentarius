@@ -1,6 +1,7 @@
 package ru.megaplan.jira.plugin.commentarius.ao.impl;
 
 import com.atlassian.activeobjects.external.ActiveObjects;
+import com.atlassian.jira.security.JiraAuthenticationContext;
 import net.java.ao.DBParam;
 import net.java.ao.Query;
 import org.apache.log4j.Logger;
@@ -29,11 +30,13 @@ public class ShabloniusConfigServiceImpl implements ShabloniusConfigService {
     private final static Logger log = Logger.getLogger(ShabloniusConfigServiceImpl.class);
     private final ActiveObjects ao;
     private final MegaPermissionGroupManager megaPermissionGroupManager;
+    private final JiraAuthenticationContext jiraAuthenticationContext;
 
     private final static String TEMPLATE_PERMISSION_GROUP_NAME = "ru.megaplan.jira.plugin.commentarius.TEMPLATE";
 
-    public ShabloniusConfigServiceImpl(ActiveObjects ao, MegaPermissionGroupManager megaPermissionGroupManager)
+    public ShabloniusConfigServiceImpl(ActiveObjects ao, MegaPermissionGroupManager megaPermissionGroupManager, JiraAuthenticationContext jiraAuthenticationContext)
     {
+        this.jiraAuthenticationContext = jiraAuthenticationContext;
         log.debug("initializing ShabloniusConfigServiceImpl...");
         this.ao = ao;
         this.megaPermissionGroupManager = megaPermissionGroupManager;
@@ -91,6 +94,7 @@ public class ShabloniusConfigServiceImpl implements ShabloniusConfigService {
         DBParam small = new DBParam("SMALL", m.getSmall());
         DBParam full = new DBParam("FULL", m.getFull());
         DBParam type = new DBParam("TYPE", m.getType());
+        DBParam creator = new DBParam("CREATOR", jiraAuthenticationContext.getLoggedInUser().getName());
        // EntityManager em = EntityManagerFa
         //PermissionBean pb = getPermissionBean(pg, m.getPermissionMock());
         IPermissionMock pm = m.getPermissionMock();
@@ -100,7 +104,7 @@ public class ShabloniusConfigServiceImpl implements ShabloniusConfigService {
         DBParam permission = new DBParam("PERMISSION_BEAN",pb.getID());
         try {
             MPSTemplateMessage mpsTemplateMessage =
-                    ao.create(MPSTemplateMessage.class, small, full, type, permission);
+                    ao.create(MPSTemplateMessage.class, small, full, type, permission, creator);
         } catch (Exception e) {
             if (e instanceof SQLException) {
                 boolean isPresent = false;
@@ -188,7 +192,7 @@ public class ShabloniusConfigServiceImpl implements ShabloniusConfigService {
     @Override
     public IMPSTemplateMessageMock getNewMessageMock(String type, String small, String full) {
         IPermissionMock permissionMock = megaPermissionGroupManager.getNewPermissionMock();
-        IMPSTemplateMessageMock result = new MPSTemplateMessageMock(type, small,full);
+        IMPSTemplateMessageMock result = new MPSTemplateMessageMock(type, small,full, jiraAuthenticationContext.getLoggedInUser().getName());
         result.setPermissionMock(permissionMock);
         return result;
     }
@@ -221,22 +225,27 @@ public class ShabloniusConfigServiceImpl implements ShabloniusConfigService {
         private String small;
         private String full;
 
+
         private IPermissionMock permissionMock;
+
+        private String creator;
 
         private int ID;
 
-        private MPSTemplateMessageMock(String type, String small, String full) {
+        private MPSTemplateMessageMock(String type, String small, String full, String creator) {
             this.type = type;
             this.small = small;
             this.full = full;
+            this.creator = creator;
         }
 
-        private MPSTemplateMessageMock(){};
+        private MPSTemplateMessageMock(){}
 
         private MPSTemplateMessageMock(MPSTemplateMessage mg) {
             type = mg.getType();
             small = mg.getSmall();
             full = mg.getFull();
+            creator = mg.getCreator();
             ID = mg.getID();
         }
 
@@ -289,6 +298,16 @@ public class ShabloniusConfigServiceImpl implements ShabloniusConfigService {
         public void setID(int ID) {
             this.ID = ID;
         }
+
+        public String getCreator() {
+            return creator;
+        }
+
+        public void setCreator(String creator) {
+            this.creator = creator;
+        }
+
+
     }
 
 

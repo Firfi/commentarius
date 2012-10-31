@@ -43,7 +43,7 @@ public class AddTemplateAction extends JiraWebActionSupport {
     private void init() {
         Collection<ProjectRole> proles = projectRoleManager.getProjectRoles();
         projectRoles = proles.toArray(new ProjectRole[proles.size()]);
-        templateTypes = new String[] {"header","body", "footer"};
+        templateTypes = new String[] {/*"header",*/"body"/*, "footer"*/};
     }
 
     @Override

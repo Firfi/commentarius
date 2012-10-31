@@ -83,61 +83,63 @@ var _shablonius_mainjs = function() {
     jQuery(document).ready(function() {
         if (jQuery('#shablonius-main').length > 0) return;
         jQuery('#footer-comment-button').click(function(){
-            jQuery('#comment-preview_link').hide();
-            jQuery('#comment').hide();
-            jQuery('#comment-issue').parent('li').hide();
-            jQuery('#issue-comment-add-submit').click(fillMainComment);
+            //jQuery('#comment-preview_link').hide();
+            //jQuery('#comment').hide();
+            //jQuery('#comment-issue').parent('li').hide();
+            //jQuery('#issue-comment-add-submit').click(fillMainComment);
         });
         var shabloniusMainDiv = jQuery('<div/>', {
             id : 'shablonius-main'
         }).css('clear','left');
-        shabloniusMainDiv.append(
+        /* shabloniusMainDiv.append(
                   'Выбор шаблона сообщения : '
                 + '<select name="shablonius_template_select" id="shablonius-template-select">'
                 + '<option value="">Номер шаблона : </option>'
                 + '</select>'
-                + 'Название :');
-                var templateTitleTextArea = jQuery('<input/>',{
-                    id: "shablonius-save-label"
-                });
-                shabloniusMainDiv.append(templateTitleTextArea);
-                shabloniusMainDiv.append('<input type="submit" class="button" id="shablonius-save-button" name="Save" value="Сохранить"></input>'
-                + '</div>'
-                +'</br>');
+                + 'Название :'
+        );
+        var templateTitleTextArea = jQuery('<input/>',{
+            id: "shablonius-save-label"
+        });
+        shabloniusMainDiv.append(templateTitleTextArea);
+        shabloniusMainDiv.append('<input type="submit" class="button" id="shablonius-save-button" name="Save" value="Сохранить"></input>'
+        + '</div>'
+        +'</br>'); */
 
         jQuery('div#addcomment').find('div.mod-content').append(shabloniusMainDiv);
 
         initHeaderBodyFooterHTML();
-        var previewElement = jQuery('<textarea/>', {
+        /* var previewElement = jQuery('<textarea/>', {
              id : 'shabloniusPreview',
              disabled : true
          }).css('background-color','#C8C8C8');
-        shabloniusMainDiv.append(previewElement);
-        areas = [headerTextArea,bodyTextArea,footerTextArea];
+        shabloniusMainDiv.append(previewElement);*/
+        //areas = [headerTextArea,bodyTextArea,footerTextArea];
 
-        for (var i = 0; i < areas.length; ++i) {
+        /* for (var i = 0; i < areas.length; ++i) {
             var area = jQuery(areas[i]);
             area.change(fillCommentAndPreview);
             area.keyup(fillCommentAndPreview);
-        }
-        jQuery.each([headerElementSelect, headerTextArea,
+        } */
+        /*jQuery.each([
         bodyElementSelect, bodyTextArea,
-        footerElementSelect, footerTextArea], function(i, v) {
+        ], function(i, v) {
            v.change(fillCommentAndPreview);
         });
+
+        createUserTemplateOptions(); */
         createOptions();
-        createUserTemplateOptions();
     });
 
     function fillCommentAndPreview() {
         fillMainComment();
-        fillPreview();
+        //fillPreview();
     }
 
     function fillMainComment() {
-        var finalComment = jQuery('#hh_ta').val() + SEPARATOR +
-            jQuery('#hb_ta').val() + SEPARATOR +
-            jQuery('#hf_ta').val();
+        var finalComment = /* jQuery('#hh_ta').val() + SEPARATOR + */ jQuery('#hb_ta').val()
+            /* + SEPARATOR +
+            jQuery('#hf_ta').val(); */
         var finalCommentArea = jQuery('#comment');
         finalCommentArea.val(finalComment);
         finalCommentArea.keyup();
@@ -207,9 +209,9 @@ var _shablonius_mainjs = function() {
                     selectedIndex = parseInt(selectedOption.val());
                     var messageObject = existMessages[selectedIndex];
                     if (messageObject) {
-                        jQuery('#hh_ta').val(messageObject.header);
+                        //jQuery('#hh_ta').val(messageObject.header);
                         jQuery('#hb_ta').val(messageObject.body);
-                        jQuery('#hf_ta').val(messageObject.footer);
+                        //jQuery('#hf_ta').val(messageObject.footer);
                         saveLabel.val(messageObject.label);
                     }
                     fillCommentAndPreview();
@@ -279,30 +281,35 @@ var _shablonius_mainjs = function() {
                 text : defaultOptionText
             });
         }
-        headerElementSelect = jQuery('<select/>',{
+        /* headerElementSelect = jQuery('<select/>',{
              name : 'head_to_answer',
              id : 'head_to_answer',
         }).append(createFirstOption());
         headerTextArea = jQuery('<textarea/>',{
              id : 'hh_ta'
-         });
+         });*/
+
         jQuery('div#shablonius-main').append('<div id="commentarius-templates-selections"/>');
         var templatesSelections = jQuery('#commentarius-templates-selections');
         templatesSelections.css('clear','left');
-        templatesSelections.append('Заголовок: ').append(headerElementSelect)
+
+        /* templatesSelections.append('Заголовок: ').append(headerElementSelect)
         .append(createAddButton(headerElementSelect,headerTextArea))
         .append(headerTextArea).append('<br/>');
+        */
+
         bodyElementSelect = jQuery('<select/>',{
              name : 'body_to_answer',
              id : 'body_to_answer',
         }).append(createFirstOption());
-        bodyTextArea = jQuery('<textarea/>',{
+        /*bodyTextArea = jQuery('<textarea/>',{
             id : 'hb_ta'
-        });
+        }); */
         templatesSelections.append('Тело: ').append(bodyElementSelect)
-        .append(createAddButton(bodyElementSelect,bodyTextArea))
-        .append(bodyTextArea).append('<br/>');
-        footerElementSelect = jQuery('<select/>',{
+        .append(createAddButton(bodyElementSelect,jQuery('#comment')));
+        /* .append(bodyTextArea).append('<br/>'); */
+
+        /* footerElementSelect = jQuery('<select/>',{
              name : 'footer_to_answer',
              id : 'footer_to_answer',
              change : function(e) {
@@ -318,11 +325,12 @@ var _shablonius_mainjs = function() {
              disabled : true
          }).css('background-color','#C8C8C8')
         templatesSelections.append('Подпись: ').append(footerElementSelect)
-        .append(footerTextArea).append('<br/>');
+        .append(footerTextArea).append('<br/>'); */
 
     }
 
     function createAddButton(from, to) {
+        var selectedOnce = false;
         var result = jQuery('<input/>',{
             type : 'image',
             src : contextPath + '/images/icons/newfeature.gif',
@@ -333,6 +341,12 @@ var _shablonius_mainjs = function() {
                 to.change();
             }
         });
+        from.change(function() {
+             if (!selectedOnce) {
+                 selectedOnce = true;
+                 result.click();
+             }
+         });
         return result;
     }
 
@@ -368,7 +382,7 @@ var _shablonius_mainjs = function() {
                     }
                 }
              });
-             el.change(fillMainComment);
+             //el.change(fillMainComment);
         }
     }
 }

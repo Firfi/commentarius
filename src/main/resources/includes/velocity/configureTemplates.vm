@@ -15,6 +15,7 @@
         <th>Тип</th>
         <th>Кратко</th>
         <th>Пространно</th>
+        <th>Создал</th>
         <th>Удалить немедленно</th>
     </tr>
     #foreach($message in $action.allTemplateMessages)
@@ -27,6 +28,7 @@
         <td>$message.type</td>
         <td>$message.small</td>
         <td>$message.full</td>
+        <td>$message.creator</td>
         <td><a href="CommentariusDeleteTemplateAction.jspa?id=$message.ID">Удалить</a></td>
     </tr>
     #end

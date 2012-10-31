@@ -30,4 +30,9 @@ public interface IMPSTemplateMessageMock {
     int getID();
 
     void setID(int ID);
+
+    String getCreator();
+
+    void setCreator(String creator);
+
 }
