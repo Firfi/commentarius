@@ -1,0 +1,135 @@
+<atlassian-plugin key="${project.groupId}.${project.artifactId}" name="${project.name}" plugins-version="2">
+    <plugin-info>
+        <description>${project.description}</description>
+        <version>${project.version}</version>
+        <vendor name="${project.organization.name}" url="${project.organization.url}" />
+    </plugin-info>
+    <web-panel key="commentarius-panel"
+               location="atl.jira.view.issue.right.context"
+               class="ru.megaplan.jira.plugin.webfragment.webpanel.CommentariusMPSWebpanel"
+               >
+        <conditions type="OR">
+            <condition key="CommentariusProjectsCondition" class="ru.megaplan.jira.plugin.webfragment.condition.CommentariusProjectsCondition"/>
+        </conditions>
+        <label>Grade</label>
+    </web-panel>
+    <web-panel key="shablonius-panel"
+               location="atl.jira.view.issue.right.context"
+               class="ru.megaplan.jira.plugin.webfragment.webpanel.ShabloniusMPSWebpanel"
+            >
+        <conditions type="OR">
+            <condition key="CommentariusProjectsCondition" class="ru.megaplan.jira.plugin.webfragment.condition.CommentariusProjectsCondition"/>
+        </conditions>
+    </web-panel>
+    <web-resource key="commentarius-mainjs" name="Mainjs" >
+        <resource type="download" name="commentarius.js" location="includes/js/commentarius.js" />
+        <context>jira.view.issue</context>
+    </web-resource>
+    <rest key="commentarius-rest" path="/commentarius" version="1.0">
+        <description>Provides commentarius services.</description>
+    </rest>
+    <webwork1 key="commentarius-config-action" name="Commentarius Config Screen">
+        <actions>
+            <action name="ru.megaplan.jira.plugin.commentarius.action.admin.ConfigureGradesAction" alias="CommentariusConfigureGradesAction">
+                <view name="success">/includes/velocity/configureGrades.vm</view>
+            </action>
+            <action name="ru.megaplan.jira.plugin.commentarius.action.admin.ConfigureProjectsAction" alias="CommentariusConfigureProjectsAction">
+                <view name="success">/includes/velocity/configureProjects.vm</view>
+            </action>
+            <action name="ru.megaplan.jira.plugin.commentarius.action.admin.ConfigureTemplatesAction" alias="CommentariusConfigureTemplatesAction">
+                <view name="success">/includes/velocity/configureTemplates.vm</view>
+            </action>
+            <action name="ru.megaplan.jira.plugin.commentarius.action.admin.ConfigureUserTemplatesAction" alias="CommentariusConfigureUserTemplatesAction">
+                <view name="success">/includes/velocity/configureUserTemplates.vm</view>
+            </action>
+            <action name="ru.megaplan.jira.plugin.commentarius.action.admin.AddTemplateAction" alias="CommentariusAddTemplateAction">
+                <view name="input">/includes/velocity/addTemplate.vm</view>
+            </action>
+            <action name="ru.megaplan.jira.plugin.commentarius.action.admin.DeleteTemplateAction" alias="CommentariusDeleteTemplateAction">
+            </action>
+        </actions>
+    </webwork1>
+
+    <ao key="commentarius-ao">
+        <entity>ru.megaplan.jira.plugin.commentarius.ao.bean.MPSGrade</entity>
+        <entity>ru.megaplan.jira.plugin.commentarius.ao.bean.CommentariusProject</entity>
+        <entity>ru.megaplan.jira.plugin.commentarius.ao.bean.MPSTemplateMessage</entity>
+        <entity>ru.megaplan.jira.plugin.commentarius.ao.bean.MPSUserTMessage</entity>
+    </ao>
+    <component key="commentarius-tx-processor" name="Transactional Annotation Processor"
+               class="com.atlassian.activeobjects.external.TransactionalAnnotationProcessor">
+        <decription>Processes @Transactional annotations.</decription>
+    </component>
+    <component-import key="commentarius-ao-import" name="Active Objects service" interface="com.atlassian.activeobjects.external.ActiveObjects">
+        <description>Component to access Active Objects functionality from the plugin</description>
+    </component-import>
+    <component-import key="megaplan-permission-group-manager-import" name="Permission Manager service"
+                      interface="ru.megaplan.jira.plugins.permission.manager.ao.MegaPermissionGroupManager">
+        <description>Component to access permissions functionality from the plugin</description>
+    </component-import>
+    <component key="commentarius-grades-settings-service"
+               name="Commentarius Grades Settings Service"
+               class="ru.megaplan.jira.plugin.commentarius.ao.impl.MPSGradeServiceImpl"/>
+    <component key="commentarius-projects-settings-service"
+               name="Commentarius Projects Settings Service"
+               class="ru.megaplan.jira.plugin.commentarius.ao.impl.CommentariusConfigServiceImpl"/>
+    <component key="commentarius-templates-settings-service"
+               name="Commentarius Templates Settings Service"
+               class="ru.megaplan.jira.plugin.commentarius.ao.impl.ShabloniusConfigServiceImpl"/>
+
+    <web-section key="mps-plugins-project-group" location="atl.jira.proj.config">
+        <label key="ru.megaplan.jira.plugin.commentarius.gradeConfigSection">Commentarius Grades</label>
+    </web-section>
+    <web-item key="commentarius-grade-project-config" section="atl.jira.proj.config/mps-plugins-project-group">
+        <label key="Grades Config">Config</label>
+        <link linkid="commentariu-grades-configure-action-link">
+            /secure/CommentariusConfigureGradesAction.jspa
+        </link>
+        <conditions type="OR">
+            <condition key="CommentariusProjectsCondition" class="ru.megaplan.jira.plugin.webfragment.condition.CommentariusProjectsCondition"/>
+        </conditions>
+    </web-item>
+    <web-item key="commentarius-template-project-config" section="atl.jira.proj.config/mps-plugins-project-group">
+        <label key="Templates Config">Config</label>
+        <link linkid="commentariu-templates-configure-action-link">
+            /secure/CommentariusConfigureTemplatesAction.jspa
+        </link>
+        <conditions type="OR">
+            <condition key="CommentariusProjectsCondition" class="ru.megaplan.jira.plugin.webfragment.condition.CommentariusProjectsCondition"/>
+        </conditions>
+    </web-item>
+    <web-section key="mps-plugins-admin-group" location="admin_plugins_menu">
+        <label>Commentarius</label>
+    </web-section>
+    <web-item key="commentarius-grades-config" section="admin_plugins_menu/mps-plugins-admin-group">
+        <label>Grades config</label>
+        <link linkid="commentarius-grades-configure-action-link">
+            /secure/admin/CommentariusConfigureGradesAction.jspa
+        </link>
+    </web-item>
+    <web-item key="commentarius-projects-config" section="admin_plugins_menu/mps-plugins-admin-group">
+        <label>Projects config</label>
+        <link linkid="commentarius-grades-configure-action-link">
+            /secure/admin/CommentariusConfigureProjectsAction.jspa
+        </link>
+    </web-item>
+    <web-item key="commentarius-templates-config" section="admin_plugins_menu/mps-plugins-admin-group">
+        <label>Templates config</label>
+        <link linkid="commentarius-templates-configure-action-link">
+            /secure/admin/CommentariusConfigureTemplatesAction.jspa
+        </link>
+    </web-item>
+
+
+
+    <customfield-type key="mps_userproperty" name="MPS User Property Field (&lt; 255 characters)"
+                      class="ru.megaplan.jira.plugin.commentarius.customfield.UserPropertyCFType">
+        <description key="admin.customfield.type.userproperty.desc">Allows the display of a user (assignee or reporter)
+            property on the view issue page, by using the default value. eg. 'assignee:phonenumber'
+        </description>
+        <resource type="velocity" name="view" location="includes/velocity/view-userproperty.vm"/>
+        <resource type="velocity" name="edit-default" location="includes/velocity/edit-userproperty.vm"/>
+        <resource type="velocity" name="xml" location="includes/xml/xml-userproperty.vm"/>
+    </customfield-type>
+
+</atlassian-plugin>

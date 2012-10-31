@@ -1,0 +1,123 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<backup xmlns="http://www.atlassian.com/ao" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <database>
+    <meta key="database.name" value="HSQL Database Engine"/>
+    <meta key="database.version" value="1.8.0"/>
+    <meta key="database.minorVersion" value="8"/>
+    <meta key="database.majorVersion" value="1"/>
+    <meta key="driver.name" value="HSQL Database Engine Driver"/>
+    <meta key="driver.version" value="1.8.0"/>
+  </database>
+  <table name="AO_563AEE_ACTIVITY_ENTITY">
+    <column name="ACTIVITY_ID" primaryKey="true" autoIncrement="true" sqlType="-5" precision="19"/>
+    <column name="ACTOR_ID" primaryKey="false" autoIncrement="false" sqlType="4" precision="10"/>
+    <column name="CONTENT" primaryKey="false" autoIncrement="false" sqlType="-1" precision="2147483647"/>
+    <column name="GENERATOR_DISPLAY_NAME" primaryKey="false" autoIncrement="false" sqlType="12" precision="255"/>
+    <column name="GENERATOR_ID" primaryKey="false" autoIncrement="false" sqlType="12" precision="767"/>
+    <column name="ICON_ID" primaryKey="false" autoIncrement="false" sqlType="4" precision="10"/>
+    <column name="ID" primaryKey="false" autoIncrement="false" sqlType="12" precision="767"/>
+    <column name="ISSUE_KEY" primaryKey="false" autoIncrement="false" sqlType="12" precision="255"/>
+    <column name="OBJECT_ID" primaryKey="false" autoIncrement="false" sqlType="4" precision="10"/>
+    <column name="POSTER" primaryKey="false" autoIncrement="false" sqlType="12" precision="255"/>
+    <column name="PROJECT_KEY" primaryKey="false" autoIncrement="false" sqlType="12" precision="255"/>
+    <column name="PUBLISHED" primaryKey="false" autoIncrement="false" sqlType="93" precision="29"/>
+    <column name="TARGET_ID" primaryKey="false" autoIncrement="false" sqlType="4" precision="10"/>
+    <column name="TITLE" primaryKey="false" autoIncrement="false" sqlType="12" precision="255"/>
+    <column name="URL" primaryKey="false" autoIncrement="false" sqlType="12" precision="767"/>
+    <column name="USERNAME" primaryKey="false" autoIncrement="false" sqlType="12" precision="255"/>
+    <column name="VERB" primaryKey="false" autoIncrement="false" sqlType="12" precision="767"/>
+    <foreignKey fromTable="AO_563AEE_ACTIVITY_ENTITY" fromColumn="ACTOR_ID" toTable="AO_563AEE_ACTOR_ENTITY" toColumn="ID"/>
+    <foreignKey fromTable="AO_563AEE_ACTIVITY_ENTITY" fromColumn="ICON_ID" toTable="AO_563AEE_MEDIA_LINK_ENTITY" toColumn="ID"/>
+    <foreignKey fromTable="AO_563AEE_ACTIVITY_ENTITY" fromColumn="OBJECT_ID" toTable="AO_563AEE_OBJECT_ENTITY" toColumn="ID"/>
+    <foreignKey fromTable="AO_563AEE_ACTIVITY_ENTITY" fromColumn="TARGET_ID" toTable="AO_563AEE_TARGET_ENTITY" toColumn="ID"/>
+  </table>
+  <table name="AO_563AEE_ACTOR_ENTITY">
+    <column name="FULL_NAME" primaryKey="false" autoIncrement="false" sqlType="12" precision="255"/>
+    <column name="ID" primaryKey="true" autoIncrement="true" sqlType="4" precision="10"/>
+    <column name="PROFILE_PAGE_URI" primaryKey="false" autoIncrement="false" sqlType="12" precision="767"/>
+    <column name="PROFILE_PICTURE_URI" primaryKey="false" autoIncrement="false" sqlType="12" precision="767"/>
+    <column name="USERNAME" primaryKey="false" autoIncrement="false" sqlType="12" precision="255"/>
+  </table>
+  <table name="AO_563AEE_MEDIA_LINK_ENTITY">
+    <column name="DURATION" primaryKey="false" autoIncrement="false" sqlType="4" precision="10"/>
+    <column name="HEIGHT" primaryKey="false" autoIncrement="false" sqlType="4" precision="10"/>
+    <column name="ID" primaryKey="true" autoIncrement="true" sqlType="4" precision="10"/>
+    <column name="URL" primaryKey="false" autoIncrement="false" sqlType="12" precision="767"/>
+    <column name="WIDTH" primaryKey="false" autoIncrement="false" sqlType="4" precision="10"/>
+  </table>
+  <table name="AO_563AEE_OBJECT_ENTITY">
+    <column name="CONTENT" primaryKey="false" autoIncrement="false" sqlType="12" precision="255"/>
+    <column name="DISPLAY_NAME" primaryKey="false" autoIncrement="false" sqlType="12" precision="255"/>
+    <column name="ID" primaryKey="true" autoIncrement="true" sqlType="4" precision="10"/>
+    <column name="IMAGE_ID" primaryKey="false" autoIncrement="false" sqlType="4" precision="10"/>
+    <column name="OBJECT_ID" primaryKey="false" autoIncrement="false" sqlType="12" precision="767"/>
+    <column name="OBJECT_TYPE" primaryKey="false" autoIncrement="false" sqlType="12" precision="767"/>
+    <column name="SUMMARY" primaryKey="false" autoIncrement="false" sqlType="12" precision="255"/>
+    <column name="URL" primaryKey="false" autoIncrement="false" sqlType="12" precision="767"/>
+    <foreignKey fromTable="AO_563AEE_OBJECT_ENTITY" fromColumn="IMAGE_ID" toTable="AO_563AEE_MEDIA_LINK_ENTITY" toColumn="ID"/>
+  </table>
+  <table name="AO_563AEE_TARGET_ENTITY">
+    <column name="CONTENT" primaryKey="false" autoIncrement="false" sqlType="12" precision="255"/>
+    <column name="DISPLAY_NAME" primaryKey="false" autoIncrement="false" sqlType="12" precision="255"/>
+    <column name="ID" primaryKey="true" autoIncrement="true" sqlType="4" precision="10"/>
+    <column name="IMAGE_ID" primaryKey="false" autoIncrement="false" sqlType="4" precision="10"/>
+    <column name="OBJECT_ID" primaryKey="false" autoIncrement="false" sqlType="12" precision="767"/>
+    <column name="OBJECT_TYPE" primaryKey="false" autoIncrement="false" sqlType="12" precision="767"/>
+    <column name="SUMMARY" primaryKey="false" autoIncrement="false" sqlType="12" precision="255"/>
+    <column name="URL" primaryKey="false" autoIncrement="false" sqlType="12" precision="767"/>
+    <foreignKey fromTable="AO_563AEE_TARGET_ENTITY" fromColumn="IMAGE_ID" toTable="AO_563AEE_MEDIA_LINK_ENTITY" toColumn="ID"/>
+  </table>
+  <data tableName="AO_563AEE_ACTIVITY_ENTITY">
+    <column name="ACTIVITY_ID"/>
+    <column name="ACTOR_ID"/>
+    <column name="CONTENT"/>
+    <column name="GENERATOR_DISPLAY_NAME"/>
+    <column name="GENERATOR_ID"/>
+    <column name="ICON_ID"/>
+    <column name="ID"/>
+    <column name="ISSUE_KEY"/>
+    <column name="OBJECT_ID"/>
+    <column name="POSTER"/>
+    <column name="PROJECT_KEY"/>
+    <column name="PUBLISHED"/>
+    <column name="TARGET_ID"/>
+    <column name="TITLE"/>
+    <column name="URL"/>
+    <column name="USERNAME"/>
+    <column name="VERB"/>
+  </data>
+  <data tableName="AO_563AEE_ACTOR_ENTITY">
+    <column name="FULL_NAME"/>
+    <column name="ID"/>
+    <column name="PROFILE_PAGE_URI"/>
+    <column name="PROFILE_PICTURE_URI"/>
+    <column name="USERNAME"/>
+  </data>
+  <data tableName="AO_563AEE_MEDIA_LINK_ENTITY">
+    <column name="DURATION"/>
+    <column name="HEIGHT"/>
+    <column name="ID"/>
+    <column name="URL"/>
+    <column name="WIDTH"/>
+  </data>
+  <data tableName="AO_563AEE_OBJECT_ENTITY">
+    <column name="CONTENT"/>
+    <column name="DISPLAY_NAME"/>
+    <column name="ID"/>
+    <column name="IMAGE_ID"/>
+    <column name="OBJECT_ID"/>
+    <column name="OBJECT_TYPE"/>
+    <column name="SUMMARY"/>
+    <column name="URL"/>
+  </data>
+  <data tableName="AO_563AEE_TARGET_ENTITY">
+    <column name="CONTENT"/>
+    <column name="DISPLAY_NAME"/>
+    <column name="ID"/>
+    <column name="IMAGE_ID"/>
+    <column name="OBJECT_ID"/>
+    <column name="OBJECT_TYPE"/>
+    <column name="SUMMARY"/>
+    <column name="URL"/>
+  </data>
+</backup>

@@ -1,0 +1,42 @@
+<form action="CommentariusConfigureProjectsAction.jspa" class="aui" enctype="multipart/form-data" method="post">
+    <div class="content-body">
+      <h2>Commentarius configuration</h2>
+
+        <div class="aui-message info">
+          <p class="title">
+            <span class="aui-icon icon-info"></span>
+            <strong>Выбранные проекты</strong>
+          </p>
+          <p>
+            Для выбранных проектов включится функционал грейдов в подписях.
+          </p>
+          <p>
+            Снять выделение с проекта можно ctrl+кликом (или, для mac, command+кликом).
+          </p>
+        </div>
+
+        <div class="field-group frother-control-renderer">
+          <label for="normalizedLabel">
+            <span class="aui-icon icon-required"></span>
+            <span class="content">required</span>
+          </label>
+          <select id="selectedProjects" name="selectedProjects" multiple>
+            #foreach($projectKey in $action.projects)
+              <option
+              #if ($action.isProjectSelected($projectKey)) selected #end
+              value="$projectKey">
+                $projectKey
+              </option>
+            #end
+          </select>
+        </div>
+
+    </div>
+    <div class="buttons-container content-footer">
+      <div class="buttons">
+        <input accesskey="s" class="button" name="Select"
+               title="Press Alt+s to submit this form" type="submit" value="Select" />
+        <input type="hidden" name="submitted" value="true" />
+      </div>
+    </div>
+  </form>

@@ -1,0 +1,25 @@
+<form action="CommentariusAddTemplateAction.jspa" class="aui" enctype="multipart/form-data" method="post">
+    <p>Проектная роль</p>
+    <select name="selectedProjectRole">
+        #foreach ($role in $action.projectRoles)
+        <option>
+            $role
+        </option>
+        #end
+    </select>
+    <select name="selectedTemplateType">
+        #foreach ($templateType in $action.templateTypes)
+        <option>
+            $templateType
+        </option>
+        #end
+    </select>
+    <p>Краткая форма</p>
+    <input type="text" name="small"></input>
+    <p>Полная форма</p>
+    <input type="text" name="full"></input>
+    <p>Сохранить</p>
+    <input type="submit" class="button" name="Add" value="Add"/>
+    <input type="hidden" name="add" value="true"/>
+
+</form>

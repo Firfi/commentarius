@@ -1,0 +1,35 @@
+#macro (adding $head $strong)
+   <h2>$head</h2>
+   <div class="aui-message info">
+      <p class="title">
+        <span class="aui-icon icon-info"></span>
+        <strong>$strong</strong>
+      </p>
+   </div>
+#end
+
+#adding("Шаблоны сообщений" "Их можно удалять.")
+<table>
+    <tr class="rowheader">
+        <th>Проектная роль</th>
+        <th>Тип</th>
+        <th>Кратко</th>
+        <th>Пространно</th>
+        <th>Удалить немедленно</th>
+    </tr>
+    #foreach($message in $action.allTemplateMessages)
+    <tr class="issuerow">
+        #if($message.permissionMock)
+            <td>$message.permissionMock.projectRoleName</td>
+        #else
+            <td>Нет проектной роли (показывается всем)</td>
+        #end
+        <td>$message.type</td>
+        <td>$message.small</td>
+        <td>$message.full</td>
+        <td><a href="CommentariusDeleteTemplateAction.jspa?id=$message.ID">Удалить</a></td>
+    </tr>
+    #end
+</table>
+
+<a href="CommentariusAddTemplateAction!default.jspa">Добавить шаблон</a>

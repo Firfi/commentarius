@@ -1,0 +1,14 @@
+<table><tbody>
+#set($i = 0)
+#foreach($num in $action.numCol)
+    <tr>
+        <td>$action.userCol.get($i)</td>
+        <td>$action.numCol.get($i)</td>
+        <td>$action.labelCol.get($i)</td>
+        <td>$action.headerCol.get($i)</td>
+        <td>$action.bodyCol.get($i)</td>
+        <td>$action.footerCol.get($i)</td>
+    </tr>
+    #set($i = $i+1)
+#end
+</tbody></table>

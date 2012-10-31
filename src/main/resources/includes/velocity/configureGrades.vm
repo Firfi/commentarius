@@ -1,0 +1,70 @@
+#macro( projectRoleSelect )
+<select id="projectRoleName", name="projectRoleName">
+#foreach ($projectRoleName in $action.projectRoleNames)
+   <option value="$projectRoleName">$projectRoleName</option>
+#end
+</select>
+#end
+
+<form action="CommentariusConfigureGradesAction.jspa" class="aui" enctype="multipart/form-data" method="post">
+    <div class="content-body">
+      <h2>Commentarius configuration</h2>
+
+        <div class="aui-message info">
+          <p class="title">
+            <span class="aui-icon icon-info"></span>
+            <strong>Удаление грейдов</strong>
+          </p>
+          <p>
+            Выбранные грейды будут <strong>безжалостно удалены</strong>.
+          </p>
+        </div>
+
+        <div class="field-group frother-control-renderer">
+          <label for="normalizedLabel">
+            <span class="aui-icon icon-required"></span>
+            <span class="content">required</span>
+          </label>
+          <select id="mpsGradesIds" name="mpsGradesIds" multiple>
+            #foreach($grade in $action.mpsGrades)
+              <option value="$grade.ID">
+                $grade.permissionMock.projectRoleName $grade.gradeName
+              </option>
+            #end
+          </select>
+        </div>
+
+    </div>
+    <div class="buttons-container content-footer">
+      <div class="buttons">
+        <input accesskey="s" class="button" name="Delete"
+               title="Press Alt+s to submit this form" type="submit" value="Delete" />
+        <input type="hidden" name="submitted" value="true" />
+        <input type="hidden" name="delete" value="true" />
+      </div>
+    </div>
+  </form>
+
+<form action="CommentariusConfigureGradesAction.jspa" class="aui" enctype="multipart/form-data" method="post">
+    <div class="content-body">
+       <h2>Добавление грейда</h2>
+       <div class="aui-message info">
+         <p class="title">
+           <span class="aui-icon icon-info"></span>
+           <strong>Введенный грейд появится в списке.</strong>
+         </p>
+       </div>
+        <div class="field-group frother-control-renderer">
+         <label for="normalizedLabel">
+           <span class="aui-icon icon-required"></span>
+           <span class="content">required</span>
+         </label>
+         #projectRoleSelect()
+         <input type="text" id="mpsGradeName" name="mpsGradeName"/>
+         <input type="submit" class="button" name="Add" value="Add"/>
+         <input type="hidden" name="submitted" value="true"/>
+         <input type="hidden" name="add" value="true"/>
+       </div>
+    </div>
+</form>
+

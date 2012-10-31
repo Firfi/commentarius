@@ -1,0 +1,19 @@
+#set($zeroLabel = "Нет должности")
+<script>
+_commentarius_mainjs.gradePropertyKey = '$gradePropertyKey';
+_commentarius_mainjs.gradePropertyValue = '$!gradePropertyValue';
+_commentarius_mainjs.username = '$remoteUserName';
+_commentarius_mainjs();
+_shablonius_mainjs();
+</script>
+<div id="commentarius_main">
+    <p>Моя должность (будет отображаться в подписи)</p>
+    <select id="commentarius_grade_select">
+    #set($i = 0)
+    <option label="$zeroLabel">$zeroLabel</option>
+    #foreach($option in $managerOptions)
+        <option label="$option.gradeName" value="$option.ID">$option.gradeName</option>
+        #set($i = $i + 1)
+    #end
+    </select>
+</div>
