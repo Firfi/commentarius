@@ -33,4 +33,7 @@ public interface MPSTemplateMessage extends Entity {
     String getCreator();
     void setCreator(String creator);
 
+    long getRole();
+    void setRole(long role);
+
 }

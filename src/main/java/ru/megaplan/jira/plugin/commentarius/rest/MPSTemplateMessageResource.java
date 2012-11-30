@@ -56,8 +56,12 @@ public class MPSTemplateMessageResource {
         List<IMPSTemplateMessageMock> lmtm = shabloniusConfigService.getTemplateMessages(type);
         Set<ProjectRole> acceptedRoles = getAcceptedRoles(u);
         for (IMPSTemplateMessageMock mtm : lmtm) {
-            if (mtm.getPermissionMock() != null && !acceptedRoles.contains(
-                    projectRoleManager.getProjectRole(mtm.getPermissionMock().getProjectRoleName()))) continue;
+            if (mtm.getRole() != null &&
+                    !acceptedRoles.contains(
+                        projectRoleManager.getProjectRole(mtm.getRole()
+                    )
+                )
+            ) continue;
             ltm.add(new TemplateMessage(mtm.getType(), mtm.getSmall(), mtm.getFull()));
         }
         Collections.sort(ltm, new Comparator<TemplateMessage>() {

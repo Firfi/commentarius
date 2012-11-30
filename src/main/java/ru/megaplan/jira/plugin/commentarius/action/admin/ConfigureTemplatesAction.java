@@ -2,6 +2,8 @@ package ru.megaplan.jira.plugin.commentarius.action.admin;
 
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.Permissions;
+import com.atlassian.jira.security.roles.ProjectRole;
+import com.atlassian.jira.security.roles.ProjectRoleManager;
 import com.atlassian.jira.web.action.JiraWebActionSupport;
 import ru.megaplan.jira.plugin.commentarius.ao.CommentariusConfigService;
 import ru.megaplan.jira.plugin.commentarius.ao.ShabloniusConfigService;
@@ -23,6 +25,7 @@ public class ConfigureTemplatesAction extends JiraWebActionSupport {
 
     private final ShabloniusConfigService shabloniusConfigService;
     private final CommentariusConfigService commentariusConfigService;
+    public final ProjectRoleManager projectRoleManager;
 
 
     private static final String SEPARATOR = "\n\n";
@@ -41,13 +44,18 @@ public class ConfigureTemplatesAction extends JiraWebActionSupport {
     private String small;
     private String full;
 
+    private String creator;
+
+    private Long role;
+
     private boolean submitted;
     private boolean delete;
     private boolean add;
 
     ConfigureTemplatesAction(
-            ShabloniusConfigService shabloniusConfigService, CommentariusConfigService commentariusConfigService) {
+            ShabloniusConfigService shabloniusConfigService, CommentariusConfigService commentariusConfigService, ProjectRoleManager projectRoleManager) {
         this.commentariusConfigService = commentariusConfigService;
+        this.projectRoleManager = projectRoleManager;
         log.debug("initializing ConfigureTemplatesAction...");
         this.shabloniusConfigService = shabloniusConfigService;
     }
@@ -94,7 +102,7 @@ public class ConfigureTemplatesAction extends JiraWebActionSupport {
         if (isAdd()) {
             checkNotNull(type);
             checkNotNull(small);
-            IMPSTemplateMessageMock message = shabloniusConfigService.getNewMessageMock(type,small,full);
+            IMPSTemplateMessageMock message = shabloniusConfigService.getNewMessageMock(type,small,full,role);
             shabloniusConfigService.addTemplateMessage(message);
             return getRedirect("CommentariusConfigureTemplatesAction.jspa");
         }
@@ -126,7 +134,18 @@ public class ConfigureTemplatesAction extends JiraWebActionSupport {
         String[] result = new String[messages.size()];
         for (int i = 0; i < messages.size(); ++i) {
             IMPSTemplateMessageMock message = messages.get(i);
-            String permname = (message.getPermissionMock() == null?"null":message.getPermissionMock().getProjectRoleName());
+
+            String permname = null;
+            if (message.getRole() == null) {
+                permname = "null";
+            } else {
+                ProjectRole role = projectRoleManager.getProjectRole(message.getRole());
+                if (role == null) {
+                    permname = "deleted role";
+                } else {
+                    permname = role.getName();
+                }
+            }
             result[i] = permname + SEPARATOR + message.getSmall() + SEPARATOR + (message.getFull()==null?"":message.getFull());
         }
         return result;
@@ -209,6 +228,24 @@ public class ConfigureTemplatesAction extends JiraWebActionSupport {
         return allTemplateMessages;
     }
 
+    public String getCreator() {
+        return creator;
+    }
 
+    public void setCreator(String creator) {
+        this.creator = creator;
+    }
+
+    public Long getRole() {
+        return role;
+    }
+
+    public void setRole(Long role) {
+        this.role = role;
+    }
+
+    public ProjectRoleManager getProjectRoleManager() {
+        return projectRoleManager;
+    }
 }
 

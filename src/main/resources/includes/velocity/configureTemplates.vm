@@ -20,8 +20,8 @@
     </tr>
     #foreach($message in $action.allTemplateMessages)
     <tr class="issuerow">
-        #if($message.permissionMock)
-            <td>$message.permissionMock.projectRoleName</td>
+        #if($message.role)
+            <td>$projectRoleManager.getProjectRole($message.role)</td>
         #else
             <td>Нет проектной роли (показывается всем)</td>
         #end

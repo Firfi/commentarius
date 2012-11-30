@@ -23,10 +23,6 @@ public interface IMPSTemplateMessageMock {
 
     void setFull(String full);
 
-    IPermissionMock getPermissionMock();
-
-    void setPermissionMock(IPermissionMock permissionMock);
-
     int getID();
 
     void setID(int ID);
@@ -34,5 +30,9 @@ public interface IMPSTemplateMessageMock {
     String getCreator();
 
     void setCreator(String creator);
+
+    Long getRole();
+
+    void setRole(Long roleID);
 
 }

@@ -275,7 +275,7 @@ var _shablonius_mainjs = function() {
     var footerTextArea;
     function initHeaderBodyFooterHTML() {
         var defaultOptionText = "Выберите вариант";
-        function createFirstOption(text) {
+        function createFirstOption() {
             return jQuery('<option/>',{
                 value : "",
                 text : defaultOptionText
@@ -305,7 +305,7 @@ var _shablonius_mainjs = function() {
         /*bodyTextArea = jQuery('<textarea/>',{
             id : 'hb_ta'
         }); */
-        templatesSelections.append('Тело: ').append(bodyElementSelect)
+        templatesSelections.append('Шаблон: ').append(bodyElementSelect).append(' ')
         .append(createAddButton(bodyElementSelect,jQuery('#comment')));
         /* .append(bodyTextArea).append('<br/>'); */
 

@@ -23,13 +23,16 @@ public interface ShabloniusConfigService {
     List<IMPSTemplateMessageMock> getAllTemplateMessages();
 
     void addTemplateMessage(IMPSTemplateMessageMock m);
+    void updateTemplateMessage(IMPSTemplateMessageMock m);
     void deleteTemplateMessage(IMPSTemplateMessageMock mg);
+
+    IMPSTemplateMessageMock getTemplateMessage(int id);
 
     List<MPSUserTMessage> getUserTemplateMessages(String username);
     List<MPSUserTMessage> getAllUserTemplateMessages();
     void addUserTemplateMessage(UserTemplateUpdateBean bean);
 
-    IMPSTemplateMessageMock getNewMessageMock(String type, String small, String full);
+    IMPSTemplateMessageMock getNewMessageMock(String type, String small, String full, Long role);
     IMPSTemplateMessageMock getNewMessageMock();
 
 

@@ -1,5 +1,6 @@
 package ru.megaplan.jira.plugin.commentarius.action.admin;
 
+import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.roles.ProjectRole;
 import com.atlassian.jira.security.roles.ProjectRoleManager;
 import com.atlassian.jira.web.action.JiraWebActionSupport;
@@ -19,24 +20,29 @@ public class AddTemplateAction extends JiraWebActionSupport {
 
     private final ShabloniusConfigService shabloniusConfigService;
     private final ProjectRoleManager projectRoleManager;
+    private final JiraAuthenticationContext jiraAuthenticationContext;
     public AddTemplateAction(ShabloniusConfigService shabloniusConfigService,
-                             ProjectRoleManager projectRoleManager) {
+                             ProjectRoleManager projectRoleManager, JiraAuthenticationContext jiraAuthenticationContext) {
         this.shabloniusConfigService = shabloniusConfigService;
         this.projectRoleManager = projectRoleManager;
+        this.jiraAuthenticationContext = jiraAuthenticationContext;
     }
 
     ProjectRole[] projectRoles;
     String[] templateTypes;
-    String selectedProjectRole;
+    Long selectedProjectRoleId;
     String selectedTemplateType;
     String small;
     String full;
+
+    boolean save;
+
+    int id;
 
     @Override
     public String doDefault() throws Exception
     {
         init();
-
         return INPUT;
     }
 
@@ -44,13 +50,30 @@ public class AddTemplateAction extends JiraWebActionSupport {
         Collection<ProjectRole> proles = projectRoleManager.getProjectRoles();
         projectRoles = proles.toArray(new ProjectRole[proles.size()]);
         templateTypes = new String[] {/*"header",*/"body"/*, "footer"*/};
+        log.warn(id);
+        if (id != 0) {
+            IMPSTemplateMessageMock message = shabloniusConfigService.getTemplateMessage(id);
+            full = message.getFull();
+            small = message.getSmall();
+            selectedTemplateType = message.getType();
+            selectedProjectRoleId = message.getRole();
+        }
     }
 
     @Override
     public String doExecute() {
-        IMPSTemplateMessageMock message = shabloniusConfigService.getNewMessageMock(selectedTemplateType,small,full);
-        message.getPermissionMock().setProjectRoleName(selectedProjectRole);
-        shabloniusConfigService.addTemplateMessage(message);
+        if (id == 0) {
+            IMPSTemplateMessageMock message = shabloniusConfigService.getNewMessageMock(selectedTemplateType, small, full, selectedProjectRoleId);
+            shabloniusConfigService.addTemplateMessage(message);
+        } else {
+            IMPSTemplateMessageMock message = shabloniusConfigService.getTemplateMessage(id);
+            message.setCreator(jiraAuthenticationContext.getLoggedInUser().getName());
+            message.setFull(full);
+            message.setRole(selectedProjectRoleId);
+            message.setSmall(small);
+            shabloniusConfigService.updateTemplateMessage(message);
+        }
+
         return getRedirect("CommentariusConfigureTemplatesAction.jspa"); // go to previous page
     }
 
@@ -78,12 +101,12 @@ public class AddTemplateAction extends JiraWebActionSupport {
         this.full = full;
     }
 
-    public String getSelectedProjectRole() {
-        return selectedProjectRole;
+    public Long getSelectedProjectRoleId() {
+        return selectedProjectRoleId;
     }
 
-    public void setSelectedProjectRole(String selectedProjectRole) {
-        this.selectedProjectRole = selectedProjectRole;
+    public void setSelectedProjectRoleId(Long selectedProjectRoleId) {
+        this.selectedProjectRoleId = selectedProjectRoleId;
     }
 
     public String[] getTemplateTypes() {
@@ -100,5 +123,21 @@ public class AddTemplateAction extends JiraWebActionSupport {
 
     public void setSelectedTemplateType(String selectedTemplateType) {
         this.selectedTemplateType = selectedTemplateType;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public boolean isSave() {
+        return save;
+    }
+
+    public void setSave(boolean save) {
+        this.save = save;
     }
 }

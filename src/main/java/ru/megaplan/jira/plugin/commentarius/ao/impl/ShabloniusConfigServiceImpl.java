@@ -29,7 +29,6 @@ public class ShabloniusConfigServiceImpl implements ShabloniusConfigService {
 
     private final static Logger log = Logger.getLogger(ShabloniusConfigServiceImpl.class);
     private final ActiveObjects ao;
-    private final MegaPermissionGroupManager megaPermissionGroupManager;
     private final JiraAuthenticationContext jiraAuthenticationContext;
 
     private final static String TEMPLATE_PERMISSION_GROUP_NAME = "ru.megaplan.jira.plugin.commentarius.TEMPLATE";
@@ -39,7 +38,6 @@ public class ShabloniusConfigServiceImpl implements ShabloniusConfigService {
         this.jiraAuthenticationContext = jiraAuthenticationContext;
         log.debug("initializing ShabloniusConfigServiceImpl...");
         this.ao = ao;
-        this.megaPermissionGroupManager = megaPermissionGroupManager;
     }
     @Override
     public List<IMPSTemplateMessageMock> getTemplateMessages(String type) {
@@ -47,26 +45,9 @@ public class ShabloniusConfigServiceImpl implements ShabloniusConfigService {
         for (MPSTemplateMessage msg : ao.find(MPSTemplateMessage.class)) {
             if (!msg.getType().equalsIgnoreCase(type)) continue;
             IMPSTemplateMessageMock messageMock = new MPSTemplateMessageMock(msg);
-            addPermissionProperty(messageMock, msg);
             messages.add(messageMock);
         }
         return messages;
-    }
-
-    private void addPermissionProperty(IMPSTemplateMessageMock messageMock, MPSTemplateMessage msg) {
-        int id = msg.getPermissionBean();
-        if (id == 0) {
-            messageMock.setPermissionMock(null);
-            return;
-        }
-        IPermissionMock permissionMock = megaPermissionGroupManager.getNewPermissionMock();
-        permissionMock.setID(id);
-        permissionMock = megaPermissionGroupManager.getPermission(permissionMock);
-        if (permissionMock == null) {
-            msg.setPermissionBean(0);
-            msg.save();
-        }
-        messageMock.setPermissionMock(permissionMock);
     }
 
     @Override
@@ -74,11 +55,6 @@ public class ShabloniusConfigServiceImpl implements ShabloniusConfigService {
         final List<IMPSTemplateMessageMock> messages = new ArrayList<IMPSTemplateMessageMock>();
         for (MPSTemplateMessage msg : ao.find(MPSTemplateMessage.class)) {
             MPSTemplateMessageMock mpsTemplateMessageMock = new MPSTemplateMessageMock(msg);
-            addPermissionProperty(mpsTemplateMessageMock, msg);
-            if (mpsTemplateMessageMock.getPermissionMock() == null) {
-                msg.setPermissionBean(0);
-                msg.save();
-            }
             messages.add(mpsTemplateMessageMock);
         }
         return messages;
@@ -89,28 +65,23 @@ public class ShabloniusConfigServiceImpl implements ShabloniusConfigService {
         checkNotNull(m);
         checkNotNull(m.getSmall());
         checkNotNull(m.getType());
-        IPermissionGroupMock pg = megaPermissionGroupManager.getPermissionGroup(TEMPLATE_PERMISSION_GROUP_NAME);
-        checkNotNull(pg);
         DBParam small = new DBParam("SMALL", m.getSmall());
         DBParam full = new DBParam("FULL", m.getFull());
         DBParam type = new DBParam("TYPE", m.getType());
         DBParam creator = new DBParam("CREATOR", jiraAuthenticationContext.getLoggedInUser().getName());
+        DBParam role = new DBParam("ROLE", m.getRole());
        // EntityManager em = EntityManagerFa
         //PermissionBean pb = getPermissionBean(pg, m.getPermissionMock());
-        IPermissionMock pm = m.getPermissionMock();
-        checkNotNull(pm.getProjectRoleName());
-        pm.setPermissionGroupMock(pg);
-        IPermissionMock pb = megaPermissionGroupManager.getUniquePermission(pm);
-        DBParam permission = new DBParam("PERMISSION_BEAN",pb.getID());
         try {
-            MPSTemplateMessage mpsTemplateMessage =
-                    ao.create(MPSTemplateMessage.class, small, full, type, permission, creator);
+            ao.create(MPSTemplateMessage.class, small, full, type, creator, role);
         } catch (Exception e) {
+            log.error("e");
             if (e instanceof SQLException) {
                 boolean isPresent = false;
                 try {
                     isPresent = isPresent(m);
                 } catch (Exception e2) {
+                    log.error("e", e2);
                 }
                 if (!isPresent) throw new RuntimeException(e);
                 else log.error("can't create duplicate for entity "
@@ -120,15 +91,22 @@ public class ShabloniusConfigServiceImpl implements ShabloniusConfigService {
         }
     }
 
-
-
+    @Override
+    public void updateTemplateMessage(IMPSTemplateMessageMock m) {
+        MPSTemplateMessage message = ao.get(MPSTemplateMessage.class, m.getID());
+        message.setCreator(m.getCreator());
+        message.setFull(m.getFull());
+        message.setSmall(m.getSmall());
+        message.setType(m.getType());
+        message.setRole(m.getRole());
+        message.save();
+    }
 
 
     @Override
     public void deleteTemplateMessage(IMPSTemplateMessageMock m) {
         checkNotNull(m);
         MPSTemplateMessage mpsTemplateMessage = null;
-        Set<Integer> deletedPermissions = new HashSet<Integer>();
         if (m.getID() != 0) {
             mpsTemplateMessage = ao.get(MPSTemplateMessage.class,m.getID());
         } else {
@@ -136,21 +114,14 @@ public class ShabloniusConfigServiceImpl implements ShabloniusConfigService {
         }
         if (mpsTemplateMessage != null) {
             ao.delete(mpsTemplateMessage);
-            deletedPermissions.add(mpsTemplateMessage.getPermissionBean());
         }
         else log.error("trying delete not existent template message");
-        cleanUnusedPermissionBeans(deletedPermissions);
     }
 
-    private void cleanUnusedPermissionBeans(Set<Integer> permissionBeanIds) {
-        for (Integer id : permissionBeanIds) {
-            //MPSGrade[] grades = ao.find(MPSGrade.class,
-            //        Query.select().where("PERMISSION_BEAN = ?", id).limit(1));
-            MPSTemplateMessage[] tmessages = ao.find(MPSTemplateMessage.class, Query.select().where("PERMISSION_BEAN = ?", id).limit(1));
-            if (tmessages.length == 0) {
-                megaPermissionGroupManager.deletePermission(id);
-            }
-        }
+    @Override
+    public IMPSTemplateMessageMock getTemplateMessage(int id) {
+        MPSTemplateMessage message = ao.get(MPSTemplateMessage.class, id);
+        return new MPSTemplateMessageMock(message);
     }
 
     @Override
@@ -186,20 +157,14 @@ public class ShabloniusConfigServiceImpl implements ShabloniusConfigService {
         }
     }
 
-    /*
-     * ShabloniusConfigService talks here witn permission group manager but not various actions
-     */
     @Override
-    public IMPSTemplateMessageMock getNewMessageMock(String type, String small, String full) {
-        IPermissionMock permissionMock = megaPermissionGroupManager.getNewPermissionMock();
-        IMPSTemplateMessageMock result = new MPSTemplateMessageMock(type, small,full, jiraAuthenticationContext.getLoggedInUser().getName());
-        result.setPermissionMock(permissionMock);
-        return result;
+    public IMPSTemplateMessageMock getNewMessageMock(String type, String small, String full, Long role) {
+        return new MPSTemplateMessageMock(type, small,full, jiraAuthenticationContext.getLoggedInUser().getName(), role);
     }
 
     @Override
     public IMPSTemplateMessageMock getNewMessageMock() {
-        return getNewMessageMock(null, null, null);
+        return new MPSTemplateMessageMock();
     }
 
     private boolean isPresent(IMPSTemplateMessageMock m) {
@@ -225,18 +190,18 @@ public class ShabloniusConfigServiceImpl implements ShabloniusConfigService {
         private String small;
         private String full;
 
-
-        private IPermissionMock permissionMock;
-
         private String creator;
+
+        private Long role;
 
         private int ID;
 
-        private MPSTemplateMessageMock(String type, String small, String full, String creator) {
+        private MPSTemplateMessageMock(String type, String small, String full, String creator, Long role) {
             this.type = type;
             this.small = small;
             this.full = full;
             this.creator = creator;
+            this.role = role;
         }
 
         private MPSTemplateMessageMock(){}
@@ -247,6 +212,7 @@ public class ShabloniusConfigServiceImpl implements ShabloniusConfigService {
             full = mg.getFull();
             creator = mg.getCreator();
             ID = mg.getID();
+            role = mg.getRole();
         }
 
         @Override
@@ -280,16 +246,6 @@ public class ShabloniusConfigServiceImpl implements ShabloniusConfigService {
         }
 
         @Override
-        public IPermissionMock getPermissionMock() {
-            return permissionMock;
-        }
-
-        @Override
-        public void setPermissionMock(IPermissionMock permissionMock) {
-            this.permissionMock = permissionMock;
-        }
-
-        @Override
         public int getID() {
             return ID;
         }
@@ -307,7 +263,13 @@ public class ShabloniusConfigServiceImpl implements ShabloniusConfigService {
             this.creator = creator;
         }
 
+        public Long getRole() {
+            return role;
+        }
 
+        public void setRole(Long role) {
+            this.role = role;
+        }
     }
 
 

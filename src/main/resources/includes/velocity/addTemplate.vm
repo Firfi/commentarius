@@ -1,9 +1,11 @@
 <form action="CommentariusAddTemplateAction.jspa" class="aui" enctype="multipart/form-data" method="post">
     <p>Проектная роль</p>
-    <select name="selectedProjectRole">
+    <select name="selectedProjectRoleId">
         #foreach ($role in $action.projectRoles)
-        <option>
-            $role
+        <option value="$role.id"
+        #if ($selectedProjectRoleId && $selectedProjectRoleId == $role.id) selected #end
+        >
+            $role.name
         </option>
         #end
     </select>
@@ -15,11 +17,12 @@
         #end
     </select>
     <p>Краткая форма</p>
-    <input type="text" name="small"></input>
+    <input type="text" name="small" value="#if($small)$small#end"></input>
     <p>Полная форма</p>
-    <textarea name="full" style="height: 120px;"></textarea>
+    <textarea name="full" style="height: 120px;">#if($full)$full#end</textarea>
     <p>Сохранить</p>
-    <input type="submit" class="button" name="Add" value="Add"/>
-    <input type="hidden" name="add" value="true"/>
+    <input type="submit" class="button" name="Save" value="Save"/>
+    <input type="hidden" name="save" value="true"/>
+    <input type="hidden" name="id" value="$!id"/>
 
 </form>
