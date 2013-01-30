@@ -1,15 +1,15 @@
-<form action="CommentariusAddTemplateAction.jspa" class="aui" enctype="multipart/form-data" method="post">
+<form name="edit" action="CommentariusAddTemplateAction.jspa" class="aui" enctype="multipart/form-data" method="post">
     <p>Проектная роль</p>
-    <select name="selectedProjectRoleId">
+    <select multiple name="selectedProjectRoleId">
         #foreach ($role in $action.projectRoles)
         <option value="$role.id"
-        #if ($selectedProjectRoleId && $selectedProjectRoleId == $role.id) selected #end
+        #if ($selectedProjectRoleIdsSet && $selectedProjectRoleIdsSet.contains($role.id)) selected #end
         >
             $role.name
         </option>
         #end
     </select>
-    <select name="selectedTemplateType">
+    <select name="selectedTemplateType" style="visibility: hidden;">
         #foreach ($templateType in $action.templateTypes)
         <option>
             $templateType
@@ -17,12 +17,44 @@
         #end
     </select>
     <p>Краткая форма</p>
-    <input type="text" name="small" value="#if($small)$small#end"></input>
+    <input type="text" name="small" value="#if($small)$small#end"/>
+    <p>Максимальный размер: <span id="maxSmall">$maxSmall</span></p>
     <p>Полная форма</p>
     <textarea name="full" style="height: 120px;">#if($full)$full#end</textarea>
+    <p>Максимальный размер: <span id="maxFull">$maxFull</span></p>
     <p>Сохранить</p>
     <input type="submit" class="button" name="Save" value="Save"/>
     <input type="hidden" name="save" value="true"/>
     <input type="hidden" name="id" value="$!id"/>
+
+
+    <script type="text/javascript">
+        jQuery("form[name=edit]").validate({
+            rules: {
+                selectedProjectRoleId: {
+                    required: true
+                },
+                small: {
+                    required: true,
+                    maxlength: $maxSmall
+                },
+                full: {
+                    required: true,
+                    maxlength: $maxFull
+                }
+            },
+            messages: {
+                small: {
+                    maxlength: jQuery.validator.format("Малый заголовок длиною должен быть более {0} символов."),
+                    required: "Введи поле!"
+                },
+                full: {
+                    maxlength: jQuery.validator.format("Большое тело должно быть не длиннее {0} символов."),
+                    required: "Введи поле!!"
+                }
+
+            }
+        });
+    </script>
 
 </form>

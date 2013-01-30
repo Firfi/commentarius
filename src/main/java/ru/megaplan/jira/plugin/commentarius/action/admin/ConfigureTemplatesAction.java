@@ -46,7 +46,7 @@ public class ConfigureTemplatesAction extends JiraWebActionSupport {
 
     private String creator;
 
-    private Long role;
+    private String roles;
 
     private boolean submitted;
     private boolean delete;
@@ -86,23 +86,29 @@ public class ConfigureTemplatesAction extends JiraWebActionSupport {
         {
             return PERMISSION_VIOLATION_RESULT;
         }
-        List<IMPSTemplateMessageMock> msgs = shabloniusConfigService.getAllTemplateMessages();
-        allTemplateMessages = msgs.toArray(new IMPSTemplateMessageMock[msgs.size()]);
-        headerObjects = shabloniusConfigService.getTemplateMessages("header");
+       // List<IMPSTemplateMessageMock> msgs = shabloniusConfigService.getAllTemplateMessages();
+
+
+        //headerObjects = shabloniusConfigService.getTemplateMessages("header");
         bodyObjects = shabloniusConfigService.getTemplateMessages("body");
-        footerObjects = shabloniusConfigService.getTemplateMessages("footer");
+        allTemplateMessages = bodyObjects.toArray(new IMPSTemplateMessageMock[bodyObjects.size()]);
+        for (IMPSTemplateMessageMock m : allTemplateMessages) {
+            m.setFull(m.getFull().replace("\n", "<br/>"));
+            m.setRoles(toPrettyRoles(m.getRoles()));
+        }
+        //footerObjects = shabloniusConfigService.getTemplateMessages("footer");
 
         if (!isSubmitted()) {
-            headers = toStringArray(headerObjects);
-            bodies = toStringArray(bodyObjects);
-            footers = toStringArray(footerObjects);
+            //headers = toStringArray(headerObjects);
+            //bodies = toStringArray(bodyObjects);
+            //footers = toStringArray(footerObjects);
             return SUCCESS;
         }
 
         if (isAdd()) {
             checkNotNull(type);
             checkNotNull(small);
-            IMPSTemplateMessageMock message = shabloniusConfigService.getNewMessageMock(type,small,full,role);
+            IMPSTemplateMessageMock message = shabloniusConfigService.getNewMessageMock(type,small,full,roles);
             shabloniusConfigService.addTemplateMessage(message);
             return getRedirect("CommentariusConfigureTemplatesAction.jspa");
         }
@@ -129,6 +135,19 @@ public class ConfigureTemplatesAction extends JiraWebActionSupport {
         return getRedirect("CommentariusConfigureTemplatesAction.jspa"); // drop session state
     }
 
+    private String toPrettyRoles(String roles) {
+        StringBuilder sb = new StringBuilder();
+        String[] roleIdsS = roles.split(":");
+        for(int i = 0; i < roleIdsS.length; ++i) {
+            Long roleId = Long.parseLong(roleIdsS[i]);
+            ProjectRole pr = projectRoleManager.getProjectRole(roleId);
+            if (pr != null) {
+                sb.append(pr.getName()).append("<br/>");
+            }
+        }
+        return sb.toString();
+    }
+
 
     private String[] toStringArray(List<IMPSTemplateMessageMock> messages) {
         String[] result = new String[messages.size()];
@@ -136,14 +155,25 @@ public class ConfigureTemplatesAction extends JiraWebActionSupport {
             IMPSTemplateMessageMock message = messages.get(i);
 
             String permname = null;
-            if (message.getRole() == null) {
+            if (message.getRoles() == null) {
                 permname = "null";
             } else {
-                ProjectRole role = projectRoleManager.getProjectRole(message.getRole());
-                if (role == null) {
+                Long[] rolesIds = AddTemplateAction.stringToLongArray(message.getRoles());
+                Set<ProjectRole> proles = new HashSet<ProjectRole>();
+                for (int j = 0; j < rolesIds.length; ++j) {
+                    ProjectRole pr = projectRoleManager.getProjectRole(rolesIds[j]);
+                    if (pr != null) {
+                        proles.add(pr);
+                    }
+                }
+                if (proles.isEmpty()) {
                     permname = "deleted role";
                 } else {
-                    permname = role.getName();
+                    Set<String> roleNames = new HashSet<String>();
+                    for (ProjectRole pr : proles) {
+                        roleNames.add(pr.getName());
+                    }
+                    permname = Arrays.toString(roleNames.toArray(new String[roleNames.size()]));
                 }
             }
             result[i] = permname + SEPARATOR + message.getSmall() + SEPARATOR + (message.getFull()==null?"":message.getFull());
@@ -236,12 +266,12 @@ public class ConfigureTemplatesAction extends JiraWebActionSupport {
         this.creator = creator;
     }
 
-    public Long getRole() {
-        return role;
+    public String getRoles() {
+        return roles;
     }
 
-    public void setRole(Long role) {
-        this.role = role;
+    public void setRoles(String role) {
+        this.roles = role;
     }
 
     public ProjectRoleManager getProjectRoleManager() {

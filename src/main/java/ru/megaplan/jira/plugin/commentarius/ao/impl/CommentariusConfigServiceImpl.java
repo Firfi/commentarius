@@ -23,7 +23,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class CommentariusConfigServiceImpl implements CommentariusConfigService {
 
-
     private final static Logger log = Logger.getLogger(CommentariusConfigServiceImpl.class);
     private final ProjectManager projectManager;
     private final ActiveObjects ao;
@@ -59,6 +58,5 @@ public class CommentariusConfigServiceImpl implements CommentariusConfigService 
             ao.create(CommentariusProject.class, cpParam);
         }
     }
-
 
 }

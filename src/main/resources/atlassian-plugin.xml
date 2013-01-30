@@ -25,6 +25,12 @@
         <resource type="download" name="commentarius.js" location="includes/js/commentarius.js" />
         <context>jira.view.issue</context>
     </web-resource>
+    <web-resource key="validation" name="Validation">
+        <resource type="download" name="validation.js" location="includes/js/validate.js" />
+    </web-resource>
+    <web-resource key="validationcss" name="Validation css">
+        <resource type="download" name="validation.css" location="includes/css/validate.css" />
+    </web-resource>
     <rest key="commentarius-rest" path="/commentarius" version="1.0">
         <description>Provides commentarius services.</description>
     </rest>
@@ -131,5 +137,7 @@
         <resource type="velocity" name="edit-default" location="includes/velocity/edit-userproperty.vm"/>
         <resource type="velocity" name="xml" location="includes/xml/xml-userproperty.vm"/>
     </customfield-type>
+
+
 
 </atlassian-plugin>

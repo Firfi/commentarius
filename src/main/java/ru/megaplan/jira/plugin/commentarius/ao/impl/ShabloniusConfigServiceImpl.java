@@ -5,6 +5,7 @@ import com.atlassian.jira.security.JiraAuthenticationContext;
 import net.java.ao.DBParam;
 import net.java.ao.Query;
 import org.apache.log4j.Logger;
+import ru.megaplan.jira.plugin.commentarius.action.admin.AddTemplateAction;
 import ru.megaplan.jira.plugin.commentarius.ao.ShabloniusConfigService;
 import ru.megaplan.jira.plugin.commentarius.ao.bean.*;
 import ru.megaplan.jira.plugin.commentarius.ao.bean.mock.IMPSTemplateMessageMock;
@@ -31,9 +32,7 @@ public class ShabloniusConfigServiceImpl implements ShabloniusConfigService {
     private final ActiveObjects ao;
     private final JiraAuthenticationContext jiraAuthenticationContext;
 
-    private final static String TEMPLATE_PERMISSION_GROUP_NAME = "ru.megaplan.jira.plugin.commentarius.TEMPLATE";
-
-    public ShabloniusConfigServiceImpl(ActiveObjects ao, MegaPermissionGroupManager megaPermissionGroupManager, JiraAuthenticationContext jiraAuthenticationContext)
+    public ShabloniusConfigServiceImpl(ActiveObjects ao, JiraAuthenticationContext jiraAuthenticationContext)
     {
         this.jiraAuthenticationContext = jiraAuthenticationContext;
         log.debug("initializing ShabloniusConfigServiceImpl...");
@@ -69,13 +68,13 @@ public class ShabloniusConfigServiceImpl implements ShabloniusConfigService {
         DBParam full = new DBParam("FULL", m.getFull());
         DBParam type = new DBParam("TYPE", m.getType());
         DBParam creator = new DBParam("CREATOR", jiraAuthenticationContext.getLoggedInUser().getName());
-        DBParam role = new DBParam("ROLE", m.getRole());
+        DBParam role = new DBParam("ROLES", m.getRoles());
        // EntityManager em = EntityManagerFa
         //PermissionBean pb = getPermissionBean(pg, m.getPermissionMock());
         try {
             ao.create(MPSTemplateMessage.class, small, full, type, creator, role);
         } catch (Exception e) {
-            log.error("e");
+            log.error("e",e);
             if (e instanceof SQLException) {
                 boolean isPresent = false;
                 try {
@@ -98,7 +97,7 @@ public class ShabloniusConfigServiceImpl implements ShabloniusConfigService {
         message.setFull(m.getFull());
         message.setSmall(m.getSmall());
         message.setType(m.getType());
-        message.setRole(m.getRole());
+        message.setRoles(m.getRoles());
         message.save();
     }
 
@@ -158,8 +157,8 @@ public class ShabloniusConfigServiceImpl implements ShabloniusConfigService {
     }
 
     @Override
-    public IMPSTemplateMessageMock getNewMessageMock(String type, String small, String full, Long role) {
-        return new MPSTemplateMessageMock(type, small,full, jiraAuthenticationContext.getLoggedInUser().getName(), role);
+    public IMPSTemplateMessageMock getNewMessageMock(String type, String small, String full, String roles) {
+        return new MPSTemplateMessageMock(type, small,full, jiraAuthenticationContext.getLoggedInUser().getName(), roles);
     }
 
     @Override
@@ -192,16 +191,16 @@ public class ShabloniusConfigServiceImpl implements ShabloniusConfigService {
 
         private String creator;
 
-        private Long role;
+        private String roles;
 
         private int ID;
 
-        private MPSTemplateMessageMock(String type, String small, String full, String creator, Long role) {
+        private MPSTemplateMessageMock(String type, String small, String full, String creator, String roles) {
             this.type = type;
             this.small = small;
             this.full = full;
             this.creator = creator;
-            this.role = role;
+            this.roles = roles;
         }
 
         private MPSTemplateMessageMock(){}
@@ -212,7 +211,7 @@ public class ShabloniusConfigServiceImpl implements ShabloniusConfigService {
             full = mg.getFull();
             creator = mg.getCreator();
             ID = mg.getID();
-            role = mg.getRole();
+            roles = mg.getRoles();
         }
 
         @Override
@@ -263,12 +262,12 @@ public class ShabloniusConfigServiceImpl implements ShabloniusConfigService {
             this.creator = creator;
         }
 
-        public Long getRole() {
-            return role;
+        public String getRoles() {
+            return roles;
         }
 
-        public void setRole(Long role) {
-            this.role = role;
+        public void setRoles(String role) {
+            this.roles = role;
         }
     }
 

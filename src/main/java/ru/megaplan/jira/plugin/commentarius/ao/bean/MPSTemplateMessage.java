@@ -2,10 +2,8 @@ package ru.megaplan.jira.plugin.commentarius.ao.bean;
 
 import net.java.ao.Entity;
 import net.java.ao.Preload;
-import net.java.ao.schema.Indexed;
 import net.java.ao.schema.NotNull;
-import net.java.ao.schema.Unique;
-import ru.megaplan.jira.plugins.permission.manager.ao.bean.PermissionBean;
+import net.java.ao.schema.StringLength;
 
 /**
  * Created with IntelliJ IDEA.
@@ -16,10 +14,17 @@ import ru.megaplan.jira.plugins.permission.manager.ao.bean.PermissionBean;
  */
 @Preload
 public interface MPSTemplateMessage extends Entity {
+
+    static final int smallLength = 255;
+    static final int fullLength = StringLength.UNLIMITED;
+
     @NotNull
+    @StringLength(value=smallLength)
     String getSmall();
     void setSmall(String small);
 
+    @NotNull
+    @StringLength(value=fullLength)
     String getFull();
     void setFull(String full);
 
@@ -33,7 +38,8 @@ public interface MPSTemplateMessage extends Entity {
     String getCreator();
     void setCreator(String creator);
 
-    long getRole();
-    void setRole(long role);
+    String getRoles();
+    void setRoles(String roles);
+
 
 }

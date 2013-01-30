@@ -4,7 +4,9 @@ import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.roles.ProjectRole;
 import com.atlassian.jira.security.roles.ProjectRoleManager;
 import com.atlassian.jira.web.action.JiraWebActionSupport;
+import com.atlassian.plugin.webresource.WebResourceManager;
 import ru.megaplan.jira.plugin.commentarius.ao.ShabloniusConfigService;
+import ru.megaplan.jira.plugin.commentarius.ao.bean.MPSTemplateMessage;
 import ru.megaplan.jira.plugin.commentarius.ao.bean.mock.IMPSTemplateMessageMock;
 
 import java.util.*;
@@ -18,11 +20,13 @@ import java.util.*;
  */
 public class AddTemplateAction extends JiraWebActionSupport {
 
+    private final WebResourceManager webResourceManager;
     private final ShabloniusConfigService shabloniusConfigService;
     private final ProjectRoleManager projectRoleManager;
     private final JiraAuthenticationContext jiraAuthenticationContext;
-    public AddTemplateAction(ShabloniusConfigService shabloniusConfigService,
+    public AddTemplateAction(WebResourceManager webResourceManager, ShabloniusConfigService shabloniusConfigService,
                              ProjectRoleManager projectRoleManager, JiraAuthenticationContext jiraAuthenticationContext) {
+        this.webResourceManager = webResourceManager;
         this.shabloniusConfigService = shabloniusConfigService;
         this.projectRoleManager = projectRoleManager;
         this.jiraAuthenticationContext = jiraAuthenticationContext;
@@ -30,10 +34,14 @@ public class AddTemplateAction extends JiraWebActionSupport {
 
     ProjectRole[] projectRoles;
     String[] templateTypes;
-    Long selectedProjectRoleId;
+    Long[] selectedProjectRoleId;
+    Set<Long> selectedProjectRoleIdsSet;
     String selectedTemplateType;
     String small;
     String full;
+
+    int maxSmall = MPSTemplateMessage.smallLength;
+    int maxFull = MPSTemplateMessage.fullLength;
 
     boolean save;
 
@@ -47,34 +55,60 @@ public class AddTemplateAction extends JiraWebActionSupport {
     }
 
     private void init() {
+        webResourceManager.requireResource("ru.megaplan.jira.plugin.commentarius:validation");
+        webResourceManager.requireResource("ru.megaplan.jira.plugin.commentarius:validationcss");
         Collection<ProjectRole> proles = projectRoleManager.getProjectRoles();
         projectRoles = proles.toArray(new ProjectRole[proles.size()]);
         templateTypes = new String[] {/*"header",*/"body"/*, "footer"*/};
-        log.warn(id);
+        selectedProjectRoleIdsSet = new HashSet<Long>();
         if (id != 0) {
             IMPSTemplateMessageMock message = shabloniusConfigService.getTemplateMessage(id);
             full = message.getFull();
             small = message.getSmall();
             selectedTemplateType = message.getType();
-            selectedProjectRoleId = message.getRole();
+            selectedProjectRoleId = stringToLongArray(message.getRoles());
+            selectedProjectRoleIdsSet = new HashSet<Long>(Arrays.asList(selectedProjectRoleId));
         }
+        if (selectedProjectRoleIdsSet.isEmpty()) selectedProjectRoleIdsSet.add(10000L);
     }
 
     @Override
     public String doExecute() {
+        String idsString = arrayToString(selectedProjectRoleId);
         if (id == 0) {
-            IMPSTemplateMessageMock message = shabloniusConfigService.getNewMessageMock(selectedTemplateType, small, full, selectedProjectRoleId);
+            IMPSTemplateMessageMock message = shabloniusConfigService.getNewMessageMock(selectedTemplateType, small, full, idsString);
             shabloniusConfigService.addTemplateMessage(message);
         } else {
             IMPSTemplateMessageMock message = shabloniusConfigService.getTemplateMessage(id);
             message.setCreator(jiraAuthenticationContext.getLoggedInUser().getName());
             message.setFull(full);
-            message.setRole(selectedProjectRoleId);
+            message.setRoles(idsString);
             message.setSmall(small);
             shabloniusConfigService.updateTemplateMessage(message);
         }
-
         return getRedirect("CommentariusConfigureTemplatesAction.jspa"); // go to previous page
+    }
+
+    private static String arrayToString(Object[] arr) {
+        if (arr == null || arr.length == 0) return "null";
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < arr.length; ++i) {
+            sb.append(arr[i]);
+            if (i != arr.length - 1) {
+                sb.append(":");
+            }
+        }
+        return sb.toString();
+    }
+
+    public static Long[] stringToLongArray(String str) {
+        if (str == null) return new Long[0];
+        String[] strs = str.split(":");
+        Long[] res = new Long[strs.length];
+        for (int i = 0; i < strs.length; ++i) {
+            res[i] = Long.parseLong(strs[i]);
+        }
+        return res;
     }
 
     public ProjectRole[] getProjectRoles() {
@@ -101,11 +135,11 @@ public class AddTemplateAction extends JiraWebActionSupport {
         this.full = full;
     }
 
-    public Long getSelectedProjectRoleId() {
+    public Long[] getSelectedProjectRoleId() {
         return selectedProjectRoleId;
     }
 
-    public void setSelectedProjectRoleId(Long selectedProjectRoleId) {
+    public void setSelectedProjectRoleId(Long[] selectedProjectRoleId) {
         this.selectedProjectRoleId = selectedProjectRoleId;
     }
 
@@ -139,5 +173,24 @@ public class AddTemplateAction extends JiraWebActionSupport {
 
     public void setSave(boolean save) {
         this.save = save;
+    }
+
+    public int getMaxSmall() {
+        return getLengthInString(maxSmall);
+    }
+
+
+    public int getMaxFull() {
+        return getLengthInString(maxFull);
+    }
+
+    private static int getLengthInString(int length) {
+        if (length == -1) {
+            return 100500;
+        } else return length;
+    }
+
+    public Set<Long> getSelectedProjectRoleIdsSet() {
+        return selectedProjectRoleIdsSet;
     }
 }

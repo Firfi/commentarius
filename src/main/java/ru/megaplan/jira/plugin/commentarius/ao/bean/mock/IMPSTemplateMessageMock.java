@@ -31,8 +31,8 @@ public interface IMPSTemplateMessageMock {
 
     void setCreator(String creator);
 
-    Long getRole();
+    String getRoles();
 
-    void setRole(Long roleID);
+    void setRoles(String rolesIDs);
 
 }

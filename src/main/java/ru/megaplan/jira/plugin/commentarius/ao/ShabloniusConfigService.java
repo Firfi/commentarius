@@ -32,7 +32,7 @@ public interface ShabloniusConfigService {
     List<MPSUserTMessage> getAllUserTemplateMessages();
     void addUserTemplateMessage(UserTemplateUpdateBean bean);
 
-    IMPSTemplateMessageMock getNewMessageMock(String type, String small, String full, Long role);
+    IMPSTemplateMessageMock getNewMessageMock(String type, String small, String full, String roles);
     IMPSTemplateMessageMock getNewMessageMock();
 
 

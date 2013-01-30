@@ -52,7 +52,7 @@ var _commentarius_mainjs = function() {
                         newValue: commselect_newvalue,
                         ID: commselect_id
                     }),
-                    contentType: 'application/json',
+                    contentType: 'application/json'
                  });
             }
             if (changeToDefault) {
@@ -339,6 +339,7 @@ var _shablonius_mainjs = function() {
                 var separator = (to.val().trim() === '' ? '' : '\n');
                 to.val(to.val() + separator + from.val());
                 to.change();
+                to.keydown();
             }
         });
         from.change(function() {

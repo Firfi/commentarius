@@ -9,6 +9,7 @@ import com.atlassian.jira.security.Permissions;
 import com.atlassian.jira.security.roles.ProjectRole;
 import com.atlassian.jira.security.roles.ProjectRoleManager;
 import org.apache.log4j.Logger;
+import ru.megaplan.jira.plugin.commentarius.action.admin.AddTemplateAction;
 import ru.megaplan.jira.plugin.commentarius.ao.CommentariusConfigService;
 import ru.megaplan.jira.plugin.commentarius.ao.ShabloniusConfigService;
 import ru.megaplan.jira.plugin.commentarius.ao.bean.MPSTemplateMessage;
@@ -56,12 +57,14 @@ public class MPSTemplateMessageResource {
         List<IMPSTemplateMessageMock> lmtm = shabloniusConfigService.getTemplateMessages(type);
         Set<ProjectRole> acceptedRoles = getAcceptedRoles(u);
         for (IMPSTemplateMessageMock mtm : lmtm) {
-            if (mtm.getRole() != null &&
-                    !acceptedRoles.contains(
-                        projectRoleManager.getProjectRole(mtm.getRole()
-                    )
-                )
-            ) continue;
+            if (mtm.getRoles() != null) {
+                Long[] selectedRoles = AddTemplateAction.stringToLongArray(mtm.getRoles());
+                Set<ProjectRole> selectedRolesSet = new HashSet<ProjectRole>();
+                for (int i = 0; i < selectedRoles.length; ++i) {
+                    selectedRolesSet.add(projectRoleManager.getProjectRole(selectedRoles[i]));
+                }
+                if (Collections.disjoint(acceptedRoles, selectedRolesSet)) continue;
+            }
             ltm.add(new TemplateMessage(mtm.getType(), mtm.getSmall(), mtm.getFull()));
         }
         Collections.sort(ltm, new Comparator<TemplateMessage>() {

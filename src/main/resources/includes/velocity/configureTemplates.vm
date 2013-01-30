@@ -9,26 +9,28 @@
 #end
 
 #adding("Шаблоны сообщений" "Их можно удалять.")
-<table>
+<table class="aui">
     <tr class="rowheader">
         <th>Проектная роль</th>
         <th>Тип</th>
         <th>Кратко</th>
         <th>Пространно</th>
         <th>Создал</th>
-        <th>Удалить немедленно</th>
+        <th>Редактировать</th>
+        <th>Удалить</th>
     </tr>
     #foreach($message in $action.allTemplateMessages)
-    <tr class="issuerow">
-        #if($message.role)
-            <td>$projectRoleManager.getProjectRole($message.role)</td>
+    <tr class="issuerow" style="word-wrap: break-word;">
+        #if($message.roles)
+            <td>$message.roles</td>
         #else
             <td>Нет проектной роли (показывается всем)</td>
         #end
         <td>$message.type</td>
         <td>$message.small</td>
-        <td>$message.full</td>
+        <td><span>$message.full</span></td>
         <td>$message.creator</td>
+        <td><a href="CommentariusAddTemplateAction!default.jspa?id=$message.ID">Редактировать</a></td>
         <td><a href="CommentariusDeleteTemplateAction.jspa?id=$message.ID">Удалить</a></td>
     </tr>
     #end
